@@ -26,7 +26,7 @@ int initAxes()
 
 		Axis[i].setTrajPeriod(period);
 		
-		Axis[i].setTarVelInCnt(0);
+		Axis[i].setTarVelInRPM(0);
 		Axis[i].setTarTorInCnt(0);
 
         info.des.e = JVec::Zero();
@@ -44,7 +44,7 @@ void readData()
     {
 
         Axis[i].setCurrentPosInCnt(ecat_iservo[i].position_);
-        Axis[i].setCurrentVelInCnt(ecat_iservo[i].velocity_);
+        Axis[i].setCurrentVelInRPM(ecat_iservo[i].velocity_);
         Axis[i].setCurrentTorInCnt(ecat_iservo[i].torque_);
         
         Axis[i].setCurrentTime(gt);
@@ -73,23 +73,23 @@ void trajectory_generation(){
 	    {
 	    case 1:
 	    	info.q_target(0)=1.5709; //info.q_target(1)=-1.5709;
-	    	traj_time = 3.0;
+	    	traj_time = 0.5;
 	    	motion++;
 	        break;
 	    case 2:
 	    	info.q_target(0)=0.0; //info.q_target(1)=0.0;
-	    	traj_time = 3.0;
+	    	traj_time = 0.5;
 	    	motion++;
 	    	// motion=1;
 	        break;
 	    case 3:
 	    	info.q_target(0)=-1.5709; //info.q_target(1)=1.5709;
-	    	traj_time = 3.0;
+	    	traj_time = 0.5;
 	    	motion++;
 	        break;
 	    case 4:
 	    	info.q_target(0)=0.0; //info.q_target(1)=0.0;
-	    	traj_time = 3.0;
+	    	traj_time = 0.5;
 	    	motion=1;
 	    	break;
 	    default:
@@ -126,40 +126,54 @@ void compute()
 
 void control()
 {
+
     double Kp = 15;
     double Kd = 5;
 
 
     for (int i = 0; i<JOINTNUM; i++)
     {
-        info.des.e(i) = info.des.q(i)-info.act.q(i);
-        info.des.eint(i) = info.des.eint(i) + info.des.e(i)*period;
-        info.des.tau(i) = Kp*info.des.e(i)+Kd*(info.des.q_dot(i)-info.act.q_dot(i));
-
+        if (ecat_iservo[i].mode_of_operation_ == ecat_iservo[i].MODE_CYCLIC_SYNC_TORQUE)
+        {
+            info.des.e(i) = info.des.q(i)-info.act.q(i);
+            info.des.eint(i) = info.des.eint(i) + info.des.e(i)*period;
+            info.des.tau(i) = Kp*info.des.e(i)+Kd*(info.des.q_dot(i)-info.act.q_dot(i));
+        }
+        else if (ecat_iservo[i].mode_of_operation_ == ecat_iservo[i].MODE_CYCLIC_SYNC_VELOCITY)
+        {
+            info.des.e(i) = info.des.q(i)-info.act.q(i);
+            info.des.tau(i) = info.des.q_dot(i) + 0.1*(info.des.q_dot(i)-info.act.q_dot(i)) + 1*info.des.e(i);
+        }
     }
 }
 
 void writeData()
 {
     for(int i=1;i<=JOINTNUM;i++){
-		Axis[i-1].setDesTorInNm(info.des.tau(i-1));
-        
-        INT16 temp = Axis[i-1].getDesTorInPer();
-        // rt_printf("temp: %d\n", temp);
-        if (temp > 1000)
+        if (ecat_iservo[i-1].mode_of_operation_ == ecat_iservo[i-1].MODE_CYCLIC_SYNC_TORQUE)
         {
-            temp = 1000;            
+            Axis[i-1].setDesTorInNm(info.des.tau(i-1));
+                
+            INT16 temp = Axis[i-1].getDesTorInPer();
+            // rt_printf("temp: %d\n", temp);
+            if (temp > 1000)
+            {
+                temp = 1000;            
+            }
+            else if (temp<-1000)
+            {
+                temp = -1000;
+            }
+            // rt_printf("temp: %d\n\n", temp);
+            // ecat_master.RxPDO1_SEND(i, (short)temp);
+            ecat_iservo[i-1].writeTorque(temp);
         }
-        else if (temp<-1000)
+        else if (ecat_iservo[i-1].mode_of_operation_ == ecat_iservo[i-1].MODE_CYCLIC_SYNC_VELOCITY)
         {
-            temp = -1000;
+            // rt_printf("velocity: %d\n",Axis[i-1].getDesVelInRPM());
+            ecat_iservo[i-1].writeVelocity(Axis[i-1].getDesVelInRPM(info.des.tau(i-1)));
         }
-        // rt_printf("temp: %d\n\n", temp);
-        // ecat_master.RxPDO1_SEND(i, (short)temp);
-        ecat_iservo[i-1].writeTorque(temp);
-        // rt_printf("velocity: %d\n",Axis[i-1].getDesVelInCnt());
-        // ecat_iservo[i-1].writeVelocity(Axis[i-1].getDesVelInCnt());
-        ecat_master.TxUpdate();
+        // ecat_master.TxUpdate();
 	}
     ecat_master.SyncEcatMaster(rt_timer_read());
 }
@@ -175,7 +189,7 @@ void motor_run(void *arg)
     for(int j=0; j<JOINTNUM; ++j)
 	{
 		ecat_master.addSlaveiServo(0, j, &ecat_iservo[j]);
-		ecat_iservo[j].mode_of_operation_ = ecat_iservo[j].MODE_CYCLIC_SYNC_TORQUE;
+		ecat_iservo[j].mode_of_operation_ = ecat_iservo[j].MODE_CYCLIC_SYNC_VELOCITY;
 	}
 
     initAxes();
@@ -304,7 +318,7 @@ void signal_handler(int signum)
     rt_task_delete(&print_task);
     rt_task_delete(&xddp_writer);
 
-    ecat_master.deactivate();
+    
 
     printf("\n\n");
 	if(signum==SIGINT)
@@ -315,6 +329,8 @@ void signal_handler(int signum)
 		printf("╔═══════════════[SIGNAL INPUT SIGTSTP]══════════════╗\n");
     printf("║                Servo drives Stopped!               ║\n");
 	printf("╚════════════════════════════════════════════════════╝\n");	
+
+    ecat_master.deactivate();
 
     exit(1);
 }
