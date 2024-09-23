@@ -1,8 +1,8 @@
 /*
- * Master.cpp
+ * Ecat_Master.cpp
  *
- *  Created on: 2018. 11. 1.
- *      Author: Administrator
+ *  Created on: 2024. 03. 04.
+ *      Author: Sunhong Kim
  */
 
 #include "Ecat_Master.h"
@@ -41,8 +41,6 @@ Master::Master(const int master) {
 		//ecrt_release_master(p_master);
 		return;
 	}
-
-
 }
 
 Master::~Master() {
@@ -302,9 +300,13 @@ void Master::SyncEcatMaster(uint64_t RefTime)
 
 void Master::deactivate(void)
 {
+    TxUpdate();
+	// ecat_master.SyncEcatMaster(rt_timer_read());
+    usleep(1000);
 	printf("Release Master!\n");
 	ecrt_release_master(p_master);
-	p_master = NULL;
+    
+	// p_master = NULL;
 	return;
 }
 

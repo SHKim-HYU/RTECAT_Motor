@@ -55,7 +55,7 @@ include CMakeFiles/RTECAT_Motor_CTRL_autogen.dir/progress.make
 
 CMakeFiles/RTECAT_Motor_CTRL_autogen:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/robot/robot_ws/RTECAT_Motor/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Automatic MOC and UIC for target RTECAT_Motor_CTRL"
-	/usr/bin/cmake -E cmake_autogen /home/robot/robot_ws/RTECAT_Motor/build/CMakeFiles/RTECAT_Motor_CTRL_autogen.dir/AutogenInfo.json Release
+	/usr/bin/cmake -E cmake_autogen /home/robot/robot_ws/RTECAT_Motor/build/CMakeFiles/RTECAT_Motor_CTRL_autogen.dir/AutogenInfo.json Debug
 
 RTECAT_Motor_CTRL_autogen: CMakeFiles/RTECAT_Motor_CTRL_autogen
 RTECAT_Motor_CTRL_autogen: CMakeFiles/RTECAT_Motor_CTRL_autogen.dir/build.make

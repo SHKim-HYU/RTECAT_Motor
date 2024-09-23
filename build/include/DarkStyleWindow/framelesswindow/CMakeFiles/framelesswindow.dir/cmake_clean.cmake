@@ -5,8 +5,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/framelesswindow.dir/framelesswindow.cpp.o"
   "CMakeFiles/framelesswindow.dir/framelesswindow_autogen/mocs_compilation.cpp.o"
   "CMakeFiles/framelesswindow.dir/windowdragger.cpp.o"
-  "libframelesswindow.a"
-  "libframelesswindow.pdb"
+  "libframelesswindowd.a"
+  "libframelesswindowd.pdb"
 )
 
 # Per-language clean rules from dependency scanning.

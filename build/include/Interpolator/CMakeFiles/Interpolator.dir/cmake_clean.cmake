@@ -3,8 +3,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/Interpolator_autogen.dir/ParseCache.txt"
   "Interpolator_autogen"
   "CMakeFiles/Interpolator.dir/Interpolator_autogen/mocs_compilation.cpp.o"
-  "libInterpolator.a"
-  "libInterpolator.pdb"
+  "libInterpolatord.a"
+  "libInterpolatord.pdb"
 )
 
 # Per-language clean rules from dependency scanning.

@@ -8,6 +8,19 @@ RT_TASK xddp_writer;
 
 using namespace std;
 
+bool isSlaveInit()
+{
+    // iServo Drive Servo on
+    for(int i=0; i<JOINTNUM; i++)
+    {
+       	if(!ecat_iservo[i].isSystemReady())
+            return false;
+    }
+
+
+    return true;
+}
+
 int initAxes()
 {
 	for (int i = 0; i < JOINTNUM; i++)
@@ -58,7 +71,6 @@ void readData()
         {
             Axis[i].setTarPosInRad(info.act.q(i));
             Axis[i].setDesPosInRad(info.act.q(i));
-            if (i == JOINTNUM-1) system_ready = 1;
         }
 
     }
@@ -72,29 +84,28 @@ void trajectory_generation(){
 	    switch(motion)
 	    {
 	    case 1:
-	    	info.q_target(0)=1.5709; //info.q_target(1)=-1.5709;
-	    	traj_time = 0.5;
+	    	info.q_target(0)=1.5709; 
+	    	traj_time = 10;
 	    	motion++;
 	        break;
 	    case 2:
-	    	info.q_target(0)=0.0; //info.q_target(1)=0.0;
-	    	traj_time = 0.5;
+	    	info.q_target(0)=0.0; 
+	    	traj_time = 10;
 	    	motion++;
 	    	// motion=1;
 	        break;
 	    case 3:
-	    	info.q_target(0)=-1.5709; //info.q_target(1)=1.5709;
-	    	traj_time = 0.5;
+	    	info.q_target(0)=-1.5709; 
+	    	traj_time = 10;
 	    	motion++;
 	        break;
 	    case 4:
-	    	info.q_target(0)=0.0; //info.q_target(1)=0.0;
-	    	traj_time = 0.5;
+	    	info.q_target(0)=0.0;
+	    	traj_time = 10;
 	    	motion=1;
 	    	break;
 	    default:
-	    	info.q_target(0)=info.act.q(0);
-            // info.q_target(1)=info.act.q(1);
+	    	info.q_target(0)=info.act.q(0); 
 
 	    	motion=1;
 	    	break;
@@ -127,8 +138,9 @@ void compute()
 void control()
 {
 
-    double Kp = 15;
-    double Kd = 5;
+    double Kp = 75;
+    double Kd = 25;
+	double Ki = 500;
 
 
     for (int i = 0; i<JOINTNUM; i++)
@@ -136,8 +148,9 @@ void control()
         if (ecat_iservo[i].mode_of_operation_ == ecat_iservo[i].MODE_CYCLIC_SYNC_TORQUE)
         {
             info.des.e(i) = info.des.q(i)-info.act.q(i);
+	        info.des.edot(i) = info.des.q_dot(i) - info.act.q_dot(i);
             info.des.eint(i) = info.des.eint(i) + info.des.e(i)*period;
-            info.des.tau(i) = Kp*info.des.e(i)+Kd*(info.des.q_dot(i)-info.act.q_dot(i));
+            info.des.tau(i) = Kp*info.des.e(i)+Kd*info.des.edot(i) + Ki*info.des.eint(i);
         }
         else if (ecat_iservo[i].mode_of_operation_ == ecat_iservo[i].MODE_CYCLIC_SYNC_VELOCITY)
         {
@@ -173,7 +186,7 @@ void writeData()
             // rt_printf("velocity: %d\n",Axis[i-1].getDesVelInRPM());
             ecat_iservo[i-1].writeVelocity(Axis[i-1].getDesVelInRPM(info.des.tau(i-1)));
         }
-        // ecat_master.TxUpdate();
+        ecat_master.TxUpdate();
 	}
     ecat_master.SyncEcatMaster(rt_timer_read());
 }
@@ -181,6 +194,8 @@ void writeData()
 void motor_run(void *arg)
 {
     RTIME beginCycle, endCycle;
+	RTIME beginCyclebuf;
+    beginCyclebuf = 0;
    
     memset(&info, 0, sizeof(ROBOT_INFO));
 
@@ -189,7 +204,8 @@ void motor_run(void *arg)
     for(int j=0; j<JOINTNUM; ++j)
 	{
 		ecat_master.addSlaveiServo(0, j, &ecat_iservo[j]);
-		ecat_iservo[j].mode_of_operation_ = ecat_iservo[j].MODE_CYCLIC_SYNC_VELOCITY;
+		// ecat_iservo[j].mode_of_operation_ = ecat_iservo[j].MODE_CYCLIC_SYNC_VELOCITY;
+        ecat_iservo[j].mode_of_operation_ = ecat_iservo[j].MODE_CYCLIC_SYNC_TORQUE;
 	}
 
     initAxes();
@@ -201,35 +217,47 @@ void motor_run(void *arg)
         rt_printf("torque constant: %lf\n", Axis[i].getTauK());
         rt_printf("encoder resol: %d\n", Axis[i].getPulsePerRevolution());
         rt_printf("motor direction: %d\n", Axis[i].getDirQ());
-
     }
 
     ecat_master.activateWithDC(0, cycle_ns);
-
+    
+    for (int i=0; i<JOINTNUM; i++)
+        ecat_iservo[i].setServoOn();
+    
     rt_task_set_periodic(NULL, TM_NOW, cycle_ns);
     while (1) {
         beginCycle = rt_timer_read();
         // Read Joints Data
         readData();
        
-        // Trajectory Generation
-        trajectory_generation();
-        
-        // Compute KDL
-        // compute();	
+        if(system_ready)
+        {
+            // Trajectory Generation
+            trajectory_generation();
+            
+            // Compute KDL
+            // compute();	
 
-        
-        // Controller
-        control();
-                
+            
+            // Controller
+            control();
+        }        
         // Write Joint Data
         writeData();
 
         endCycle = rt_timer_read();
 		periodCycle = (unsigned long) endCycle - beginCycle;
+        periodLoop = (unsigned long) beginCycle - beginCyclebuf;
 
-        gt+= period;
-        if (periodCycle > cycle_ns) overruns++;
+        if(isSlaveInit()) 
+            system_ready = true;
+        
+        if(system_ready)
+        {
+            gt+= period;
+            if (periodCycle > cycle_ns) overruns++;
+            if (periodLoop > worstLoop) worstLoop = periodLoop;
+        }
         rt_task_wait_period(NULL); //wait for next cycle
     }
 }
@@ -285,12 +313,6 @@ void print_run(void *arg)
 			
 			for(int j=0; j<JOINTNUM; ++j){
 				rt_printf("ID: %d", j);
-			// 	//rt_printf("\t CtrlWord: 0x%04X, ",		ControlWord[j]);
-			// 	//rt_printf("\t StatWord: 0x%04X, \n",	StatusWord[j]);
-			//     //rt_printf("\t DeviceState: %d, ",		DeviceState[j]);
-			// 	//rt_printf("\t ModeOfOp: %d,	\n",		ModeOfOperationDisplay[j]);
-                // rt_printf("\t[cnt] pos: %d, vel: %d, [per] tor: %d\n",info.q_inc[j], info.dq_inc[j], info.tau_per[j]);
-                // rt_printf("\t[rad] pos: %lf, vel: %lf, [Nm] tor: %lf\n",info.act.q[j], info.act.q_dot[j], info.act.tau[j]);
 				rt_printf("\t ActPos: %lf, ActVel: %lf \n",info.act.q(j), info.act.q_dot(j));
 				rt_printf("\t DesPos: %lf, DesVel :%lf, DesAcc :%lf\n",info.des.q[j],info.des.q_dot[j],info.des.q_ddot[j]);
 				rt_printf("\t TarTor: %lf, ActTor: %lf, ExtTor: %lf \n", info.des.tau(j), info.act.tau(j), info.act.tau_ext(j));
@@ -317,8 +339,11 @@ void signal_handler(int signum)
     rt_task_delete(&motor_task);
     rt_task_delete(&print_task);
     rt_task_delete(&xddp_writer);
-
     
+    for(int i=0; i<JOINTNUM; i++)
+        ecat_iservo[i].setServoOff();
+        
+    ecat_master.deactivate();
 
     printf("\n\n");
 	if(signum==SIGINT)
@@ -329,8 +354,6 @@ void signal_handler(int signum)
 		printf("╔═══════════════[SIGNAL INPUT SIGTSTP]══════════════╗\n");
     printf("║                Servo drives Stopped!               ║\n");
 	printf("╚════════════════════════════════════════════════════╝\n");	
-
-    ecat_master.deactivate();
 
     exit(1);
 }
@@ -356,15 +379,6 @@ int main(int argc, char *argv[])
     CPU_SET(7, &cpuset_rt1);  
     CPU_SET(5, &cpuset_rt2);  
 
-    // // For CST (cyclic synchronous torque) control
-	// if (ecat_master.init(OP_MODE_CYCLIC_SYNC_TORQUE, cycle_ns) == -1)
-	// {
-	// 	printf("System Initialization Failed\n");
-	//     return 0;
-	// }
-	// for (int i = 0; i < JOINTNUM; ++i)
-	// 	ModeOfOperation[i] = OP_MODE_CYCLIC_SYNC_TORQUE;
-    
     // std::thread qtThread(runQtApplication, argc, argv);
     // pthread_t pthread = qtThread.native_handle();
     // int rc = pthread_setaffinity_np(pthread, sizeof(cpu_set_t), &cpuset_qt);

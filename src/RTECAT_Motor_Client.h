@@ -48,19 +48,14 @@ double period=((double) cycle_ns)/((double) NSEC_PER_SEC);	//period in second un
 static int run = 1;
 
 unsigned long periodCycle = 0, worstCycle = 0;
+unsigned long periodLoop = 0, worstLoop = 0;
 unsigned int overruns = 0;
 
-// FT Sensor parameter
-unsigned char data_field[16];
-short raw_data[6] = { 0 };
-unsigned short temp;
-float DF=50.0, DT=1000.0;
-float ft_array[6];
 
 // Interface to physical axes
 NRMKHelper::ServoAxis Axis[JOINTNUM];
 const int 	 zeroPos[JOINTNUM] = {0};
-const INT32 	 gearRatio[JOINTNUM] = {18};
+const INT32 	 gearRatio[JOINTNUM] = {1};
 
 // EtherCAT System interface object
 Master ecat_master;
@@ -77,23 +72,6 @@ double gt=0;
 double traj_time=0;
 int motion=-1;
 
-////////////// TxPDO //////////////
-// iServo
-UINT16	StatusWord[JOINTNUM] = {0,};
-INT32 	ActualPos[JOINTNUM] = {0,};
-INT32 	ActualVel[JOINTNUM] = {0,};
-INT16 	ActualTor[JOINTNUM] = {0,};
-UINT32	DataIn[JOINTNUM] = {0,};
-UINT8	ModeOfOperationDisplay[JOINTNUM] = {0,};
-
-////////////// RxPDO //////////////
-// iServo
-INT32 	TargetPos[JOINTNUM] = {0,};
-INT32 	TargetVel[JOINTNUM] = {0,};
-INT16 	TargetTor[JOINTNUM] = {0,};
-UINT8 	ModeOfOperation[JOINTNUM] = {0,};
-UINT16	Controlword[JOINTNUM] = {0,};
-
 typedef struct STATE{
 	JVec q;
 	JVec q_dot;
@@ -101,6 +79,7 @@ typedef struct STATE{
 	JVec tau;
 	JVec tau_ext;
 	JVec e;
+	JVec edot;
 	JVec eint;
 	JVec G;
 

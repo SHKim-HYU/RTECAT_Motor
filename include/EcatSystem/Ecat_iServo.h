@@ -21,7 +21,20 @@ public:
     /** Returns true if iServo has reached "operation enabled" state.
      *  The transition through the state machine is handled automatically. */
     bool initialized() const {return initialized_;}
-
+    bool isSystemReady() const {return _systemReady;}
+    
+    void setServoOn()
+    {
+        _servoOn=true;
+    }
+    void setServoOff()
+    {
+        _servoOn=false;
+    }
+    bool isServoOn()
+    {
+        return _servoOn;
+    }
 
     int iServo_DeviceState(void) const {return state_;};
 
@@ -53,9 +66,21 @@ public:
 		//RxPDO
 		case 0:
             control_word_ = EC_READ_U16(domain_address);
-
+            if (_servoOn)
+            {
+                control_word_ = transition(state_, control_word_);
+                // printf("controlword: %u\n", control_word_);
+                // printf("statusword: %u\n", state_);
+                if(state_ == STATE_OPERATION_ENABLED)
+                    _systemReady = true;
+            }
+            else
+            {
+                control_word_ = 0;
+                _systemReady = false;
+            }
             //initialization sequence
-            control_word_ = transition(state_, control_word_);
+            
             EC_WRITE_U16(domain_address, control_word_);
             break;
 		case 1:
@@ -261,6 +286,8 @@ private:
     DeviceState state_ = STATE_START;
 
     bool initialized_ = false;
+    bool _systemReady = false;
+    bool _servoOn = false;
 
 
 

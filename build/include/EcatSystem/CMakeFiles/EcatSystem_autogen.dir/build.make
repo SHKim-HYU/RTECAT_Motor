@@ -55,7 +55,7 @@ include include/EcatSystem/CMakeFiles/EcatSystem_autogen.dir/progress.make
 
 include/EcatSystem/CMakeFiles/EcatSystem_autogen:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/robot/robot_ws/RTECAT_Motor/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Automatic MOC and UIC for target EcatSystem"
-	cd /home/robot/robot_ws/RTECAT_Motor/build/include/EcatSystem && /usr/bin/cmake -E cmake_autogen /home/robot/robot_ws/RTECAT_Motor/build/include/EcatSystem/CMakeFiles/EcatSystem_autogen.dir/AutogenInfo.json Release
+	cd /home/robot/robot_ws/RTECAT_Motor/build/include/EcatSystem && /usr/bin/cmake -E cmake_autogen /home/robot/robot_ws/RTECAT_Motor/build/include/EcatSystem/CMakeFiles/EcatSystem_autogen.dir/AutogenInfo.json Debug
 
 EcatSystem_autogen: include/EcatSystem/CMakeFiles/EcatSystem_autogen
 EcatSystem_autogen: include/EcatSystem/CMakeFiles/EcatSystem_autogen.dir/build.make

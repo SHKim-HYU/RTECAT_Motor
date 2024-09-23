@@ -1,8 +1,8 @@
 /*
- * Master.h
+ * Ecat_Master.h
  *
- *  Created on: 2018. 11. 1.
- *      Author: Administrator
+ *  Created on: 2024. 03. 04.
+ *      Author: Sunhong Kim
  */
 
 #ifndef ECATSYSTEM_ECAT_MASTER_H_

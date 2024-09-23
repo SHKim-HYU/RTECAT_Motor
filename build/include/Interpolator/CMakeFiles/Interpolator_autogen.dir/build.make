@@ -55,7 +55,7 @@ include include/Interpolator/CMakeFiles/Interpolator_autogen.dir/progress.make
 
 include/Interpolator/CMakeFiles/Interpolator_autogen:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/robot/robot_ws/RTECAT_Motor/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Automatic MOC and UIC for target Interpolator"
-	cd /home/robot/robot_ws/RTECAT_Motor/build/include/Interpolator && /usr/bin/cmake -E cmake_autogen /home/robot/robot_ws/RTECAT_Motor/build/include/Interpolator/CMakeFiles/Interpolator_autogen.dir/AutogenInfo.json Release
+	cd /home/robot/robot_ws/RTECAT_Motor/build/include/Interpolator && /usr/bin/cmake -E cmake_autogen /home/robot/robot_ws/RTECAT_Motor/build/include/Interpolator/CMakeFiles/Interpolator_autogen.dir/AutogenInfo.json Debug
 
 Interpolator_autogen: include/Interpolator/CMakeFiles/Interpolator_autogen
 Interpolator_autogen: include/Interpolator/CMakeFiles/Interpolator_autogen.dir/build.make

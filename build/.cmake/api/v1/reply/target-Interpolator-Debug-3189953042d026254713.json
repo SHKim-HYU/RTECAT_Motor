@@ -3,7 +3,7 @@
 	"artifacts" : 
 	[
 		{
-			"path" : "include/Interpolator/libInterpolator.a"
+			"path" : "include/Interpolator/libInterpolatord.a"
 		}
 	],
 	"backtrace" : 1,
@@ -53,7 +53,7 @@
 			"compileCommandFragments" : 
 			[
 				{
-					"fragment" : " -std=c++17 -Wall -Wextra -fPIC -O2 -DNDEBUG  "
+					"fragment" : " -std=c++17 -Wall -Wextra -fPIC -g -fno-omit-frame-pointer -fno-inline-functions -fno-inline-functions-called-once -fno-optimize-sibling-calls  "
 				},
 				{
 					"fragment" : "-std=c++17"
@@ -112,7 +112,7 @@
 	],
 	"id" : "Interpolator::@3b557d557d621394a5fb",
 	"name" : "Interpolator",
-	"nameOnDisk" : "libInterpolator.a",
+	"nameOnDisk" : "libInterpolatord.a",
 	"paths" : 
 	{
 		"build" : "include/Interpolator",

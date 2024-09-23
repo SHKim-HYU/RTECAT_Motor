@@ -109,11 +109,11 @@ RTECAT_Motor_CTRL: CMakeFiles/RTECAT_Motor_CTRL.dir/RTECAT_Motor_CTRL_autogen/mo
 RTECAT_Motor_CTRL: CMakeFiles/RTECAT_Motor_CTRL.dir/src/RTECAT_Motor_Client.cpp.o
 RTECAT_Motor_CTRL: CMakeFiles/RTECAT_Motor_CTRL.dir/src/mainwindow.cpp.o
 RTECAT_Motor_CTRL: CMakeFiles/RTECAT_Motor_CTRL.dir/build.make
-RTECAT_Motor_CTRL: include/EcatSystem/libEcatSystem.a
-RTECAT_Motor_CTRL: include/Interpolator/libInterpolator.a
-RTECAT_Motor_CTRL: include/Robot/libRobot.so
-RTECAT_Motor_CTRL: include/QtWidgets/libQtWidgets.a
-RTECAT_Motor_CTRL: include/DarkStyleWindow/libDarkStyleWindow.a
+RTECAT_Motor_CTRL: include/EcatSystem/libEcatSystemd.a
+RTECAT_Motor_CTRL: include/Interpolator/libInterpolatord.a
+RTECAT_Motor_CTRL: include/Robot/libRobotd.so
+RTECAT_Motor_CTRL: include/QtWidgets/libQtWidgetsd.a
+RTECAT_Motor_CTRL: include/DarkStyleWindow/libDarkStyleWindowd.a
 RTECAT_Motor_CTRL: /opt/etherlab/lib/libethercat.a
 RTECAT_Motor_CTRL: /opt/etherlab/lib/libethercat_rtdm.a
 RTECAT_Motor_CTRL: /usr/lib/x86_64-linux-gnu/libjsoncpp.so.1.7.4
@@ -121,7 +121,7 @@ RTECAT_Motor_CTRL: /usr/lib/x86_64-linux-gnu/libPocoFoundation.so
 RTECAT_Motor_CTRL: /usr/lib/x86_64-linux-gnu/libPocoUtil.so
 RTECAT_Motor_CTRL: /usr/lib/x86_64-linux-gnu/libPocoZip.so
 RTECAT_Motor_CTRL: /usr/lib/x86_64-linux-gnu/libPocoNet.so
-RTECAT_Motor_CTRL: include/DarkStyleWindow/framelesswindow/libframelesswindow.a
+RTECAT_Motor_CTRL: include/DarkStyleWindow/framelesswindow/libframelesswindowd.a
 RTECAT_Motor_CTRL: /opt/Qt5.14.2/5.14.2/gcc_64/lib/libQt5Widgets.so.5.14.2
 RTECAT_Motor_CTRL: /opt/Qt5.14.2/5.14.2/gcc_64/lib/libQt5Quick.so.5.14.2
 RTECAT_Motor_CTRL: /opt/Qt5.14.2/5.14.2/gcc_64/lib/libQt5Gui.so.5.14.2
