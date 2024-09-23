@@ -5,8 +5,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/EcatSystem.dir/EcatSystem_autogen/mocs_compilation.cpp.o"
   "CMakeFiles/EcatSystem.dir/Ecat_Master.cpp.o"
   "CMakeFiles/EcatSystem.dir/PDOConfig.c.o"
-  "libEcatSystemd.a"
-  "libEcatSystemd.pdb"
+  "libEcatSystem.a"
+  "libEcatSystem.pdb"
 )
 
 # Per-language clean rules from dependency scanning.

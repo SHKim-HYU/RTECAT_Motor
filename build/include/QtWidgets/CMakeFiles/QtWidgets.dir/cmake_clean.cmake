@@ -13,8 +13,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/QtWidgets.dir/QtThermoMeter.cpp.o"
   "CMakeFiles/QtWidgets.dir/QtWidgetWithBackground.cpp.o"
   "CMakeFiles/QtWidgets.dir/QtWidgets_autogen/mocs_compilation.cpp.o"
-  "libQtWidgetsd.a"
-  "libQtWidgetsd.pdb"
+  "libQtWidgets.a"
+  "libQtWidgets.pdb"
 )
 
 # Per-language clean rules from dependency scanning.

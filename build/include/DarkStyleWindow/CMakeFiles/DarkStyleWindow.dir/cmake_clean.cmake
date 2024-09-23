@@ -4,8 +4,8 @@ file(REMOVE_RECURSE
   "DarkStyleWindow_autogen"
   "CMakeFiles/DarkStyleWindow.dir/DarkStyle.cpp.o"
   "CMakeFiles/DarkStyleWindow.dir/DarkStyleWindow_autogen/mocs_compilation.cpp.o"
-  "libDarkStyleWindowd.a"
-  "libDarkStyleWindowd.pdb"
+  "libDarkStyleWindow.a"
+  "libDarkStyleWindow.pdb"
 )
 
 # Per-language clean rules from dependency scanning.

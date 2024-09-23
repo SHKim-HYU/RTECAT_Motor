@@ -3,8 +3,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/Robot_autogen.dir/ParseCache.txt"
   "Robot_autogen"
   "CMakeFiles/Robot.dir/Robot_autogen/mocs_compilation.cpp.o"
-  "libRobotd.pdb"
-  "libRobotd.so"
+  "libRobot.pdb"
+  "libRobot.so"
 )
 
 # Per-language clean rules from dependency scanning.

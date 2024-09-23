@@ -1,3 +1,3 @@
 file(REMOVE_RECURSE
-  "libDarkStyleWindowd.a"
+  "libDarkStyleWindow.a"
 )

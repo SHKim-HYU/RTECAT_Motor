@@ -62,7 +62,7 @@
 			"compileCommandFragments" : 
 			[
 				{
-					"fragment" : " -std=c++17 -Wall -Wextra -fPIC -g -fno-omit-frame-pointer -fno-inline-functions -fno-inline-functions-called-once -fno-optimize-sibling-calls  "
+					"fragment" : " -std=c++17 -Wall -Wextra -fPIC -O2 -DNDEBUG  "
 				},
 				{
 					"fragment" : "-D_GNU_SOURCE -D_REENTRANT -fasynchronous-unwind-tables -D__COBALT__"
@@ -88,6 +88,10 @@
 				{
 					"backtrace" : 2,
 					"define" : "QT_NETWORK_LIB"
+				},
+				{
+					"backtrace" : 2,
+					"define" : "QT_NO_DEBUG"
 				},
 				{
 					"backtrace" : 2,
@@ -268,7 +272,7 @@
 		"commandFragments" : 
 		[
 			{
-				"fragment" : "-std=c++17 -Wall -Wextra -fPIC -g -fno-omit-frame-pointer -fno-inline-functions -fno-inline-functions-called-once -fno-optimize-sibling-calls",
+				"fragment" : "-std=c++17 -Wall -Wextra -fPIC -O2 -DNDEBUG",
 				"role" : "flags"
 			},
 			{
@@ -281,17 +285,17 @@
 			},
 			{
 				"backtrace" : 2,
-				"fragment" : "include/EcatSystem/libEcatSystemd.a",
+				"fragment" : "include/EcatSystem/libEcatSystem.a",
 				"role" : "libraries"
 			},
 			{
 				"backtrace" : 2,
-				"fragment" : "include/Interpolator/libInterpolatord.a",
+				"fragment" : "include/Interpolator/libInterpolator.a",
 				"role" : "libraries"
 			},
 			{
 				"backtrace" : 2,
-				"fragment" : "include/Robot/libRobotd.so",
+				"fragment" : "include/Robot/libRobot.so",
 				"role" : "libraries"
 			},
 			{
@@ -300,12 +304,12 @@
 			},
 			{
 				"backtrace" : 2,
-				"fragment" : "include/QtWidgets/libQtWidgetsd.a",
+				"fragment" : "include/QtWidgets/libQtWidgets.a",
 				"role" : "libraries"
 			},
 			{
 				"backtrace" : 2,
-				"fragment" : "include/DarkStyleWindow/libDarkStyleWindowd.a",
+				"fragment" : "include/DarkStyleWindow/libDarkStyleWindow.a",
 				"role" : "libraries"
 			},
 			{
@@ -365,7 +369,7 @@
 				"role" : "libraries"
 			},
 			{
-				"fragment" : "include/DarkStyleWindow/framelesswindow/libframelesswindowd.a",
+				"fragment" : "include/DarkStyleWindow/framelesswindow/libframelesswindow.a",
 				"role" : "libraries"
 			},
 			{
