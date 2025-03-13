@@ -281,6 +281,7 @@ void motor_run(void *arg)
             if (periodCycle > cycle_ns) overruns++;
             if (periodLoop > worstLoop) worstLoop = periodLoop;
         }
+        beginCyclebuf = beginCycle;
         rt_task_wait_period(NULL); //wait for next cycle
     }
 }
@@ -332,7 +333,7 @@ void print_run(void *arg)
 			itime+=step;
 			previous=now;
 
-			rt_printf("Time=%0.3lfs, cycle_dt=%lius,  overrun=%d\n", gt, periodCycle/1000, overruns);
+			rt_printf("Time=%0.3lfs, cycle_dt=%lius, worst_cycle=%lius, overrun=%d\n", gt, periodCycle/1000, worstLoop/1000, overruns);
 			
 			for(int j=0; j<JOINTNUM; ++j){
 				rt_printf("ID: %d", j);
