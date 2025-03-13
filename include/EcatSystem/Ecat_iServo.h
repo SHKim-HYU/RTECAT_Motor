@@ -10,10 +10,10 @@
 
 #include "Ecat_Slave.h"
 #include "PDOConfig.h"
+#include "PropertyDefinition.h"
 
 class Ecat_iServo : public Slave
 {
-public:
 public:
 	Ecat_iServo() : Slave(iServo_VendorID, iServo_ProductCode) {}
     virtual ~Ecat_iServo() {}
@@ -22,6 +22,8 @@ public:
      *  The transition through the state machine is handled automatically. */
     bool initialized() const {return initialized_;}
     bool isSystemReady() const {return _systemReady;}
+    bool isHoming() {return homing_;}
+    void reHoming() {this->homing_ = 0;}
     
     void setServoOn()
     {
@@ -51,6 +53,40 @@ public:
         target_velocity_ = velocity;
     }
 
+    int32_t HomingOffset(int position)
+    {
+    	return (unsigned int)m_HomingOffset[position];
+    }
+
+    int32_t HomingPosition(int position)
+    {
+    	return (unsigned int)m_HomingPosition[position];
+    }
+
+    int32_t HomingPosCurrentLimit(int position)
+    {
+    	return (unsigned int)m_HomingPosCurrentLimit[position];
+    }
+
+    int32_t HomingNegCurrentLimit(int position)
+    {
+    	return (unsigned int)m_HomingNegCurrentLimit[position];
+    }
+
+    int8_t HomingMethod(int position)
+    {
+    	return (unsigned char)m_HomingMethod[position];
+    }
+
+    uint32_t HomingSpeed(int position)
+    {
+    	return (unsigned int)m_HomingSpeed[position];
+    }
+
+    uint32_t HomingAcceleration(int position)
+    {
+    	return (unsigned int)m_HomingAcceleration[position];
+    }
 
 
     /** Maximum torque in Nm,
@@ -68,9 +104,10 @@ public:
             control_word_ = EC_READ_U16(domain_address);
             if (_servoOn)
             {
-                control_word_ = transition(state_, control_word_);
                 // printf("controlword: %u\n", control_word_);
                 // printf("statusword: %u\n", state_);
+                control_word_ = transition(state_, control_word_);
+                // printf("controlword: %u\n", control_word_);
                 if(state_ == STATE_OPERATION_ENABLED)
                     _systemReady = true;
             }
@@ -99,6 +136,7 @@ public:
 		case 5:
             status_word_ = EC_READ_U16(domain_address);
             state_ = deviceState(status_word_);
+            // printf("statusword: %u\n\n", state_);
             break;
 		case 6:
             position_ = EC_READ_S32(domain_address);
@@ -176,6 +214,7 @@ public:
         MODE_PROFILED_POSITION      = 1,
         MODE_PROFILED_VELOCITY      = 3,
         MODE_PROFILED_TORQUE        = 4,
+        MODE_HOMING                 = 6,
         MODE_INTERPOLATED_POSITION  = 7,
         MODE_CYCLIC_SYNC_POSITION   = 8,
         MODE_CYCLIC_SYNC_VELOCITY   = 9,
@@ -208,7 +247,14 @@ private:
         STATE_OPERATION_ENABLED				= 7,
         STATE_QUICK_STOP_ACTIVE				= 8,
         STATE_FAULT_REACTION_ACTIVE			= 9,
-        STATE_FAULT							= 10
+        STATE_FAULT							= 10,
+		STATE_HOMING_PROGRESS				= 11,
+		STATE_HOMING_NOT_START				= 12,
+        STATE_HOMING_TARGET_NOT_REACHED     = 13,
+		STATE_HOMING_NOT_ATTAINED        	= 14,
+		STATE_HOMING_COMPLITE				= 15,
+		STATE_HOMING_ERROR					= 16,
+		STATE_HOMING_UNDIFINED
     };
 
     std::map<DeviceState,std::string> device_state_str_ = {
@@ -220,7 +266,14 @@ private:
          {STATE_OPERATION_ENABLED,      	"Operation Enabled"},
          {STATE_QUICK_STOP_ACTIVE,      	"Quick Stop Active"},
          {STATE_FAULT_REACTION_ACTIVE,  	"Fault Reaction Active"},
-         {STATE_FAULT,                  	"Fault"}
+         {STATE_FAULT,                  	"Fault"},
+		 {STATE_HOMING_PROGRESS,        	"Homing Progress"},
+		 {STATE_HOMING_NOT_START,       	"Homing Not Start"},
+		 {STATE_HOMING_TARGET_NOT_REACHED,  "Homing target not reached"},
+		 {STATE_HOMING_NOT_ATTAINED,        "Homing not attained"},
+		 {STATE_HOMING_COMPLITE,        	"Homing Finished"},
+		 {STATE_HOMING_ERROR,           	"Homing Error"},
+		 {STATE_HOMING_UNDIFINED,       	"Homing Undefined"}
     };
 
     /** returns device state based upon the status_word */
@@ -238,8 +291,37 @@ private:
         else if ((status_word & 0b01101111) == 0b00100011){
         	return STATE_SWITCH_ON;
         }
+        // else if ((status_word & 0b01101111) == 0b00100111){
+    	// 	return STATE_OPERATION_ENABLED;        	
+        // }
         else if ((status_word & 0b01101111) == 0b00100111){
-    		return STATE_OPERATION_ENABLED;        	
+        	if(mode_of_operation_display_ == MODE_HOMING){
+                if((((status_word & 0xff00)>>8) & 0b01000000 ) == 0b01000000)
+        		{
+        			homing_ = true;
+        			return STATE_HOMING_COMPLITE;
+        		}
+        		else if     ((((status_word & 0xff00)>>8) & 0b00110100 ) == 0b00000000)
+        			return STATE_HOMING_PROGRESS;
+        		else if((((status_word & 0xff00)>>8) & 0b00110100 ) == 0b00000100)
+        			return STATE_HOMING_TARGET_NOT_REACHED;
+        		else if((((status_word & 0xff00)>>8) & 0b00110100 ) == 0b00010000)
+        			return STATE_HOMING_NOT_ATTAINED;
+        		else if((((status_word & 0xff00)>>8) & 0b00110100 ) == 0b00010100)
+        		{
+        			homing_ = true;
+        			return STATE_HOMING_COMPLITE;
+        		}
+        		else if((((status_word & 0xff00)>>8) & 0b00110100 ) == 0b00100000)
+        		    return STATE_HOMING_ERROR;
+        		else if((((status_word & 0xff00)>>8) & 0b00110100 ) == 0b00100100)
+        		    return STATE_HOMING_ERROR;
+        		else
+        			return STATE_HOMING_UNDIFINED;
+        	}
+        	else{
+        		return STATE_OPERATION_ENABLED;
+        	}
         }
         else if ((status_word & 0b01101111) == 0b00000111){
             return STATE_QUICK_STOP_ACTIVE;
@@ -255,6 +337,9 @@ private:
 
     uint16_t transition(DeviceState state, uint16_t control_word)
     {
+        if( (control_word & 0b10000000) == 0b10000000)
+            return ((control_word & 0b00000000) | 0b00000000);
+
         switch(state)
         {
         case STATE_START:                   // -> STATE_NOT_READY_TO_SWITCH_ON (automatic)
@@ -275,6 +360,18 @@ private:
             return control_word;
         case STATE_FAULT:                   // -> STATE_SWITCH_ON_DISABLED
             return ((control_word & 0b11111111) | 0b10000000);
+        case STATE_HOMING_PROGRESS:
+        	return ((control_word & 0b00011111) | 0b00011111);
+        case STATE_HOMING_TARGET_NOT_REACHED:
+            return ((control_word & 0b00000000) | 0b10000000);
+        case STATE_HOMING_NOT_ATTAINED:
+        	return ((control_word & 0b00000000) | 0b10000000);
+        case STATE_HOMING_COMPLITE:
+        	return ((control_word & 0b00001111) | 0b00001111);
+        case STATE_HOMING_ERROR:
+        	return ((control_word & 0b00000000) | 0b10000000);
+        case STATE_HOMING_UNDIFINED:
+        	return ((control_word & 0b00011111) | 0b00011111);
         default:
             break;
         }
@@ -288,9 +385,17 @@ private:
     bool initialized_ = false;
     bool _systemReady = false;
     bool _servoOn = false;
+    bool homing_ = false;
+    bool homing_ready_ = false;
 
-
-
+    // 5. Homing Parameters     
+    int32_t 	m_HomingOffset[JOINTNUM] = {-2000};				// cnt
+    int32_t 	m_HomingPosition[JOINTNUM] = {2000};				// cnt
+    int32_t	    m_HomingNegCurrentLimit[JOINTNUM] = {-100}; 					// Per Thoussand of rated torque
+    int32_t	    m_HomingPosCurrentLimit[JOINTNUM] = {100}; 					// Per Thoussand of rated torque
+    int8_t 		m_HomingMethod[JOINTNUM] = {-3};							//
+    uint32_t 	m_HomingSpeed[JOINTNUM] = {50};					// RPM
+    uint32_t    m_HomingAcceleration[JOINTNUM] = {500}; 
 };
 
 #endif /* ECATSYSTEM_ECAT_ISERVO_H_ */

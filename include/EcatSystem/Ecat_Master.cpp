@@ -134,7 +134,18 @@ void Master::addSlaveiServo(uint16_t alias, uint16_t position, Ecat_iServo* slav
     }
     m_slave_info.push_back(slave_info);
 
-    
+    //Setup Homing Parameters
+
+	printf("Homming Param Setup-> Alias:%d, Position:%d\n", alias, position);
+
+    SDOwrite_HOMING_OFFSET(position, slave->HomingOffset(position));
+	SDOwrite_HOMING_POSITION(position, slave->HomingPosition(position));
+	SDOwrite_HOMING_NEG_CURRENT_LIMIT(position, slave->HomingNegCurrentLimit(position));
+	SDOwrite_HOMING_POS_CURRENT_LIMIT(position, slave->HomingPosCurrentLimit(position));
+	SDOwrite_HOMING_METHOD(position, slave->HomingMethod(position));
+	SDOwrite_HOMING_SPEED(position, slave->HomingSpeed(position));
+	SDOwrite_HOMING_ACCELERATION(position, slave->HomingAcceleration(position));
+
     size_t num_syncs = slave->syncSize();
     const ec_sync_info_t* syncs = slave->syncs();
     if(num_syncs > 0){
@@ -450,28 +461,28 @@ void Master::checkSlaveStates()
     }
 }
 
-int Master::SDO_ENCODER_RESOLUTION(int position)
+int Master::SDOread_ENCODER_RESOLUTION(int position)
 {
     uint8_t *u32_data = new uint8_t[4];
     SDOread(position, OBJ_ENCODER_RESOLUTION, 1, u32_data);
     return (int)(u32_data[0] + (u32_data[1]<<8) + (u32_data[2]<<16) + (u32_data[3]<<24));
 }
 
-int Master::SDO_RATE_CURRENT(int position)
+int Master::SDOread_RATE_CURRENT(int position)
 {
     uint8_t *u32_data = new uint8_t[4];
     SDOread(position, OBJ_RATE_CURRENT, 0, u32_data);
     return (int)(u32_data[0] + (u32_data[1]<<8) + (u32_data[2]<<16) + (u32_data[3]<<24));
 }
 
-int Master::SDO_TORQUE_CONSTANT(int position)
+int Master::SDOread_TORQUE_CONSTANT(int position)
 {
     uint8_t *u32_data = new uint8_t[4];
     SDOread(position, OBJ_TORQUE_CONSTANT, 0, u32_data);
     return (int)(u32_data[0] + (u32_data[1]<<8) + (u32_data[2]<<16) + (u32_data[3]<<24));
 }
 
-int Master::SDO_MOTOR_DIRECTION(int position)
+int Master::SDOread_MOTOR_DIRECTION(int position)
 {
     uint8_t *u8_data = new uint8_t[1];
     SDOread(position, OBJ_MOTOR_DIRECTION, 0, u8_data);
@@ -480,6 +491,68 @@ int Master::SDO_MOTOR_DIRECTION(int position)
 	if (res == 0) res=1;	// 0 - nomal  -->  1 - nomal
 	else res=-1;			// 1 - invert --> -1 - invert
 	return res;
+}
+
+void Master::SDOwrite_MODE_OF_OPERATION(int position, int mode)
+{
+    uint8_t* si8_data = new uint8_t[1];
+	EC_WRITE_S8(si8_data, (unsigned char)mode);
+	SDOwrite(position, OBJ_OPERATIONMODE, 0, si8_data);
+	delete[] si8_data;
+}
+
+void Master::SDOwrite_HOMING_OFFSET(int position, int data)
+{
+    uint8_t* si32_data = new uint8_t[4];
+	EC_WRITE_S32(si32_data, data);
+	SDOwrite(position, OBJ_HOMING_OFFSET, 0, si32_data);
+	delete[] si32_data;
+}
+
+void Master::SDOwrite_HOMING_POSITION(int position, int data)
+{
+    uint8_t* si32_data = new uint8_t[4];
+	EC_WRITE_S32(si32_data, data);
+	SDOwrite(position, OBJ_HOMING_POSITION, 0, si32_data);
+	delete[] si32_data;
+}
+
+void Master::SDOwrite_HOMING_NEG_CURRENT_LIMIT(int position, int data)
+{
+    uint8_t* si32_data = new uint8_t[4];
+	EC_WRITE_S32(si32_data, data);
+	SDOwrite(position, OBJ_HOMING_TORQUE_LIMIT, 1, si32_data);
+	delete[] si32_data;
+}
+
+void Master::SDOwrite_HOMING_POS_CURRENT_LIMIT(int position, int data)
+{
+    uint8_t* si32_data = new uint8_t[4];
+	EC_WRITE_S32(si32_data, data);
+	SDOwrite(position, OBJ_HOMING_TORQUE_LIMIT, 2, si32_data);
+	delete[] si32_data;
+}
+
+void Master::SDOwrite_HOMING_METHOD(int position, int data)
+{
+    uint8_t h1_data = data;
+	SDOwrite(position, OBJ_HOMING_METHOD, 0, &h1_data);
+}
+
+void Master::SDOwrite_HOMING_SPEED(int position, int data)
+{
+    uint8_t* u32_data = new uint8_t[4];
+	EC_WRITE_U32(u32_data, data);
+	SDOwrite(position, OBJ_HOMING_VELOCITY, 1, u32_data);
+	delete[] u32_data;
+}
+
+void Master::SDOwrite_HOMING_ACCELERATION(int position, int data)
+{
+    uint8_t* u32_data = new uint8_t[4];
+	EC_WRITE_U32(u32_data, data);
+	SDOwrite(position, OBJ_HOMING_ACCELERATION, 0, u32_data);
+	delete[] u32_data;
 }
 
 void Master::printWarning(const std::string& message)

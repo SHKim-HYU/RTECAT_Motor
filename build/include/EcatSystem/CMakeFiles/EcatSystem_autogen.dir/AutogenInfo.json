@@ -58,6 +58,7 @@
 		"/usr/xenomai/include/cobalt",
 		"/usr/xenomai/include",
 		"/usr/xenomai/include/alchemy",
+		"/usr/include/eigen3",
 		"/usr/include/c++/9",
 		"/usr/include/x86_64-linux-gnu/c++/9",
 		"/usr/include/c++/9/backward",

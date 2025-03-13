@@ -13,7 +13,8 @@
 		[
 			"add_library",
 			"include_directories",
-			"target_include_directories"
+			"target_include_directories",
+			"target_link_libraries"
 		],
 		"files" : 
 		[
@@ -49,13 +50,19 @@
 			{
 				"command" : 2,
 				"file" : 0,
-				"line" : 20,
+				"line" : 24,
 				"parent" : 0
 			},
 			{
 				"command" : 2,
 				"file" : 0,
-				"line" : 35,
+				"line" : 39,
+				"parent" : 0
+			},
+			{
+				"command" : 3,
+				"file" : 0,
+				"line" : 18,
 				"parent" : 0
 			}
 		]
@@ -126,6 +133,11 @@
 				{
 					"backtrace" : 6,
 					"path" : "/usr/xenomai/include/alchemy"
+				},
+				{
+					"backtrace" : 7,
+					"isSystem" : true,
+					"path" : "/usr/include/eigen3"
 				}
 			],
 			"language" : "CXX",
@@ -196,6 +208,11 @@
 				{
 					"backtrace" : 6,
 					"path" : "/usr/xenomai/include/alchemy"
+				},
+				{
+					"backtrace" : 7,
+					"isSystem" : true,
+					"path" : "/usr/include/eigen3"
 				}
 			],
 			"language" : "C",

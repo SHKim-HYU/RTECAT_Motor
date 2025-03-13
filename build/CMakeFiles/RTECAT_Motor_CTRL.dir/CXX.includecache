@@ -41,6 +41,8 @@ CiA402_Object_Dictionary.h
 ../include/EcatSystem/CiA402_Object_Dictionary.h
 Ecat_iServo.h
 ../include/EcatSystem/Ecat_iServo.h
+PropertyDefinition.h
+../include/EcatSystem/PropertyDefinition.h
 
 ../include/EcatSystem/Ecat_Slave.h
 ecrt.h
@@ -57,6 +59,8 @@ Ecat_Slave.h
 ../include/EcatSystem/Ecat_Slave.h
 PDOConfig.h
 ../include/EcatSystem/PDOConfig.h
+PropertyDefinition.h
+../include/EcatSystem/PropertyDefinition.h
 
 ../include/EcatSystem/PDOConfig.h
 ecrt.h

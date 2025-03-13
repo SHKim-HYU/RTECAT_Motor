@@ -79,3 +79,4 @@ typedef Eigen::Matrix<double, 3, 3> Matrix3d;
 typedef Eigen::Matrix<double, 6, JOINTNUM> Matrix6xn;
 typedef Eigen::Matrix<double, 6, JOINTNUM+1> Matrix6xn_1;
 typedef Eigen::Matrix<double, JOINTNUM, JOINTNUM> MassMat;
+

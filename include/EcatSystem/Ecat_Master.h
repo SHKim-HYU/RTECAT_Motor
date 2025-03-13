@@ -17,6 +17,7 @@
 
 #include "CiA402_Object_Dictionary.h"
 #include "Ecat_iServo.h"
+#include "PropertyDefinition.h"
 
 class Master {
 public:
@@ -38,10 +39,22 @@ public:
 	void checkMasterState();
 	void checkSlaveStates();
 
-	int SDO_ENCODER_RESOLUTION(int position);
-	int SDO_RATE_CURRENT(int position);
-	int SDO_TORQUE_CONSTANT(int position);
-	int SDO_MOTOR_DIRECTION(int position);
+
+	// SDO_Functions
+	// read
+	int SDOread_ENCODER_RESOLUTION(int position);
+	int SDOread_RATE_CURRENT(int position);
+	int SDOread_TORQUE_CONSTANT(int position);
+	int SDOread_MOTOR_DIRECTION(int position);
+	// write
+	void SDOwrite_MODE_OF_OPERATION(int position, int mode);
+	void SDOwrite_HOMING_OFFSET(int position, int data);
+	void SDOwrite_HOMING_POSITION(int position, int data);
+	void SDOwrite_HOMING_NEG_CURRENT_LIMIT(int position, int data);
+	void SDOwrite_HOMING_POS_CURRENT_LIMIT(int position, int data);
+	void SDOwrite_HOMING_METHOD(int position, int data);
+	void SDOwrite_HOMING_SPEED(int position, int data);
+	void SDOwrite_HOMING_ACCELERATION(int position, int data);
 
 
 private:

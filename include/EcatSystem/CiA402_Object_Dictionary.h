@@ -73,6 +73,12 @@
 #define OBJ_RATE_CURRENT			0x6075		// RW,	UINT32
 #define OBJ_CURRENT_ACTUAL 			0x6078		// R,	INT16
 #define OBJ_ENCODER_RESOLUTION		0x608f		// RW,	UINT32
+#define OBJ_HOMING_METHOD			0x6098		// RW,	INT8
+#define OBJ_HOMING_VELOCITY			0x6099		// RW,	UINT32, 1(zero search velocity), 2(index search velocity)
+#define OBJ_HOMING_ACCELERATION		0x609A		// RW,	UINT32
+#define OBJ_HOMING_OFFSET			0x607C		// RW,	INT32
+#define OBJ_HOMING_POSITION			0x20BE		// RW,	INT32
+#define OBJ_HOMING_TORQUE_LIMIT		0x20BF		// RW,	INT32, 1(Negative),2(Positive)
 
 #define OBJ_SUBINDEX_NULL 			0x00U
 

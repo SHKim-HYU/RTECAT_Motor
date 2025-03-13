@@ -24,6 +24,7 @@ set(CMAKE_C_TARGET_INCLUDE_PATH
   "/usr/xenomai/include/cobalt"
   "/usr/xenomai/include"
   "/usr/xenomai/include/alchemy"
+  "/usr/include/eigen3"
   )
 set(CMAKE_DEPENDS_CHECK_CXX
   "/home/robot/robot_ws/RTECAT_Motor/build/include/EcatSystem/EcatSystem_autogen/mocs_compilation.cpp" "/home/robot/robot_ws/RTECAT_Motor/build/include/EcatSystem/CMakeFiles/EcatSystem.dir/EcatSystem_autogen/mocs_compilation.cpp.o"
@@ -46,6 +47,7 @@ set(CMAKE_CXX_TARGET_INCLUDE_PATH
   "/usr/xenomai/include/cobalt"
   "/usr/xenomai/include"
   "/usr/xenomai/include/alchemy"
+  "/usr/include/eigen3"
   )
 
 # Targets to which this target links.

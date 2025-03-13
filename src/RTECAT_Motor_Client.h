@@ -51,6 +51,8 @@ unsigned long periodCycle = 0, worstCycle = 0;
 unsigned long periodLoop = 0, worstLoop = 0;
 unsigned int overruns = 0;
 
+//For Homing management
+int HomingFlag = 0;
 
 // Interface to physical axes
 NRMKHelper::ServoAxis Axis[JOINTNUM];

@@ -13,6 +13,10 @@ add_library(sub::ECAT ALIAS ${PROJECT_NAME})
 target_include_directories( ${PROJECT_NAME}
         PUBLIC ${PRJECT_SOURCE_DIR})
 
+# Eigen3
+find_package(Eigen3 3.0 REQUIRED NO_MODULE)
+target_link_libraries(${PROJECT_NAME} PUBLIC Eigen3::Eigen)
+
 find_package(Etherlab REQUIRED)
 if(Etherlab_FOUND)
     message(STATUS "Etherlab_INC_DIRS = ${Etherlab_INCLUDE_DIR}")

@@ -8,6 +8,23 @@ RT_TASK xddp_writer;
 
 using namespace std;
 
+void isSlaveHoming()
+{
+    for(int i=0; i<JOINTNUM; i++)
+    {
+        if(!ecat_iservo[i].isHoming())
+        {
+            ecat_iservo[i].mode_of_operation_ = ecat_iservo[i].MODE_HOMING;
+        }
+        else
+        {
+            ecat_iservo[i].mode_of_operation_ = ecat_iservo[i].MODE_CYCLIC_SYNC_VELOCITY;
+            HomingFlag = 1;
+        }
+
+    }
+}
+
 bool isSlaveInit()
 {
     // iServo Drive Servo on
@@ -27,13 +44,13 @@ int initAxes()
 	{	
 		Axis[i].setGearRatio(gearRatio[i]);
 		Axis[i].setGearEfficiency(EFFICIENCY);
-		Axis[i].setPulsePerRevolution(ecat_master.SDO_ENCODER_RESOLUTION(i));
-		Axis[i].setTauRateCur(((double)ecat_master.SDO_RATE_CURRENT(i))/1000.0);
-		Axis[i].setTauK(((double)ecat_master.SDO_TORQUE_CONSTANT(i))/1000000.0);
+		Axis[i].setPulsePerRevolution(ecat_master.SDOread_ENCODER_RESOLUTION(i));
+		Axis[i].setTauRateCur(((double)ecat_master.SDOread_RATE_CURRENT(i))/1000.0);
+		Axis[i].setTauK(((double)ecat_master.SDOread_TORQUE_CONSTANT(i))/1000000.0);
 		Axis[i].setZeroPos(zeroPos[i]);
 
-		Axis[i].setDirQ(ecat_master.SDO_MOTOR_DIRECTION(i));
-		Axis[i].setDirTau(ecat_master.SDO_MOTOR_DIRECTION(i));
+		Axis[i].setDirQ(ecat_master.SDOread_MOTOR_DIRECTION(i));
+		Axis[i].setDirTau(ecat_master.SDOread_MOTOR_DIRECTION(i));
 
 		Axis[i].setConversionConstants();
 
@@ -155,7 +172,7 @@ void control()
         else if (ecat_iservo[i].mode_of_operation_ == ecat_iservo[i].MODE_CYCLIC_SYNC_VELOCITY)
         {
             info.des.e(i) = info.des.q(i)-info.act.q(i);
-            info.des.tau(i) = info.des.q_dot(i) + 0.1*(info.des.q_dot(i)-info.act.q_dot(i)) + 1*info.des.e(i);
+            info.des.tau(i) = info.des.q_dot(i) + 0.5*(info.des.q_dot(i)-info.act.q_dot(i)) + 10*info.des.e(i);
         }
     }
 }
@@ -204,8 +221,8 @@ void motor_run(void *arg)
     for(int j=0; j<JOINTNUM; ++j)
 	{
 		ecat_master.addSlaveiServo(0, j, &ecat_iservo[j]);
-		// ecat_iservo[j].mode_of_operation_ = ecat_iservo[j].MODE_CYCLIC_SYNC_VELOCITY;
-        ecat_iservo[j].mode_of_operation_ = ecat_iservo[j].MODE_CYCLIC_SYNC_TORQUE;
+		ecat_iservo[j].mode_of_operation_ = ecat_iservo[j].MODE_CYCLIC_SYNC_VELOCITY;
+        // ecat_iservo[j].mode_of_operation_ = ecat_iservo[j].MODE_CYCLIC_SYNC_TORQUE;
 	}
 
     initAxes();
@@ -232,19 +249,25 @@ void motor_run(void *arg)
        
         if(system_ready)
         {
-            // Trajectory Generation
-            trajectory_generation();
-            
-            // Compute KDL
-            // compute();	
+            isSlaveHoming();
 
-            
-            // Controller
-            control();
+            if(HomingFlag == 1)
+            {
+                // Trajectory Generation
+                trajectory_generation();
+                
+                // Compute KDL
+                // compute();	
+
+                
+                // Controller
+                control();
+            }
         }        
         // Write Joint Data
         writeData();
 
+        
         endCycle = rt_timer_read();
 		periodCycle = (unsigned long) endCycle - beginCycle;
         periodLoop = (unsigned long) beginCycle - beginCyclebuf;
@@ -389,7 +412,7 @@ int main(int argc, char *argv[])
 
     rt_task_create(&print_task, "print_task", 0, 70, 0);
     rt_task_set_affinity(&print_task, &cpuset_rt2);
-    rt_task_start(&print_task, &print_run, NULL);
+    // rt_task_start(&print_task, &print_run, NULL);
 
     // Must pause here
     pause();
